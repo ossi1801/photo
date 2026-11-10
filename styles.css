@@ -105,6 +105,12 @@ html, body {
   border: 1px solid var(--border-subtle);
 }
 
+.meta-pill.proxy-active {
+  color: #fde68a;
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.1);
+}
+
 /* ==================== BUTTONS ==================== */
 .btn {
   display: inline-flex;
@@ -439,7 +445,8 @@ html, body {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
-.zoom-controls {
+.zoom-controls,
+.proxy-controls {
   display: flex;
   align-items: center;
   background: rgba(23, 25, 31, 0.9);
@@ -448,6 +455,14 @@ html, body {
   border-radius: var(--radius-md);
   padding: 3px;
   gap: 2px;
+}
+
+.proxy-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0 6px 0 7px;
+  letter-spacing: 0.02em;
 }
 
 .hud-btn {
@@ -459,10 +474,15 @@ html, body {
   padding: 4px 9px;
   border-radius: 5px;
   cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 .hud-btn:hover {
   color: var(--text-main);
   background: var(--bg-elevated);
+}
+.hud-btn.active {
+  background: var(--accent);
+  color: #fff;
 }
 
 .zoom-label {
@@ -973,6 +993,28 @@ input[type="color"]::-webkit-color-swatch {
   border-radius: 10px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+}
+
+.modal-card-wide {
+  width: 440px;
+}
+
+.modal-question {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+.proxy-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.export-subnote {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #6ee7b7;
 }
 
 .modal-header {

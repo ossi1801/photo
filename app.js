@@ -175,6 +175,9 @@
   let splitCompareEnabled = false;
   let splitPosition = 0.5; // 0..1 across canvas
   let zoomMode = 'fit';
+  let previewScale = 1; // 1 = Full, 0.5 = Half Proxy, 0.25 = Quarter Proxy
+  let fullOutW = 0;
+  let fullOutH = 0;
   let renderPending = false;
 
   // Interactive Crop Draft Box
@@ -183,6 +186,7 @@
   let cropDragState = null;
 
   // Offscreen Buffers
+  const proxySourceCanvas = document.createElement('canvas');
   const orientedCanvas = document.createElement('canvas');
   const ungradedCropCanvas = document.createElement('canvas');
   const sharpCanvas = document.createElement('canvas');
@@ -396,8 +400,70 @@
     document.getElementById('btn-redo').disabled = historyIndex >= history.length - 1;
   }
 
-  // ==================== IMAGE LOADING ====================
-  function loadNewSourceImage(img) {
+  // ==================== IMAGE LOADING & PROXY MANAGEMENT ====================
+  function isImageLargerThan4K(w, h) {
+    // 4K UHD is 3840 × 2160 (8,294,400 px). Trigger if dimensions or pixel count exceed or match 4K.
+    return w > 3840 || h > 3840 || (w * h) > 3840 * 2160 || (w >= 3840 && h >= 2160) || (w >= 2160 && h >= 3840);
+  }
+
+  function formatImageSizeInfo(w, h, fileSize) {
+    const mp = ((w * h) / 1e6).toFixed(1);
+    if (fileSize && fileSize > 0) {
+      const mb = (fileSize / (1024 * 1024)).toFixed(1);
+      return `${w} × ${h} px, ${mp} MP, ${mb} MB`;
+    }
+    return `${w} × ${h} px, ${mp} MP`;
+  }
+
+  function rebuildProxySource() {
+    if (!sourceImage || previewScale >= 1) {
+      proxySourceCanvas.width = 0;
+      proxySourceCanvas.height = 0;
+      return;
+    }
+    const srcW = sourceImage.naturalWidth || sourceImage.width;
+    const srcH = sourceImage.naturalHeight || sourceImage.height;
+    const pw = Math.max(1, Math.round(srcW * previewScale));
+    const ph = Math.max(1, Math.round(srcH * previewScale));
+
+    proxySourceCanvas.width = pw;
+    proxySourceCanvas.height = ph;
+    const pCtx = proxySourceCanvas.getContext('2d');
+    pCtx.imageSmoothingEnabled = true;
+    pCtx.imageSmoothingQuality = 'high';
+    pCtx.drawImage(sourceImage, 0, 0, pw, ph);
+  }
+
+  function syncProxyControlsUI() {
+    document.querySelectorAll('#proxy-controls [data-proxy-scale]').forEach((btn) => {
+      const btnScale = parseFloat(btn.dataset.proxyScale);
+      btn.classList.toggle('active', Math.abs(btnScale - previewScale) < 0.001);
+    });
+  }
+
+  function setPreviewScale(scale) {
+    previewScale = scale;
+    rebuildProxySource();
+    syncProxyControlsUI();
+    requestRender();
+    requestAnimationFrame(() => updateViewportZoom());
+  }
+
+  function openProxyPromptModal(w, h, fileSize) {
+    const proxyModal = document.getElementById('proxy-modal');
+    const questionEl = document.getElementById('proxy-modal-question');
+    const origResEl = document.getElementById('proxy-orig-res');
+    const halfResEl = document.getElementById('proxy-half-res');
+
+    const sizeDesc = formatImageSizeInfo(w, h, fileSize);
+    questionEl.textContent = `Do you want to use proxy/lower image quality to preview this image (${sizeDesc})?`;
+    origResEl.textContent = `${w} × ${h} px`;
+    halfResEl.textContent = `${Math.max(1, Math.round(w * 0.5))} × ${Math.max(1, Math.round(h * 0.5))} px`;
+
+    proxyModal.classList.remove('hidden');
+  }
+
+  function loadNewSourceImage(img, meta = {}) {
     sourceImage = img;
     state = structuredClone(DEFAULT_PARAMS);
     history = [];
@@ -406,6 +472,23 @@
     cropDraft = { ...state.crop };
     syncUIFromState();
     zoomMode = 'fit';
+
+    const srcW = img.naturalWidth || img.width;
+    const srcH = img.naturalHeight || img.height;
+
+    if (meta.isUserUpload && isImageLargerThan4K(srcW, srcH)) {
+      // Pre-render at 1/2 proxy while asking so loading a huge photo stays instant
+      previewScale = 0.5;
+      rebuildProxySource();
+      syncProxyControlsUI();
+      openProxyPromptModal(srcW, srcH, meta.fileSize);
+    } else {
+      previewScale = 1;
+      rebuildProxySource();
+      syncProxyControlsUI();
+      document.getElementById('proxy-modal').classList.add('hidden');
+    }
+
     requestRender();
     requestAnimationFrame(() => updateViewportZoom());
   }
@@ -415,7 +498,7 @@
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
-      img.onload = () => loadNewSourceImage(img);
+      img.onload = () => loadNewSourceImage(img, { isUserUpload: true, fileSize: file.size });
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
@@ -731,16 +814,23 @@
     });
   }
 
-  function renderFrame() {
+  function renderFrame({ forExport = false } = {}) {
     if (!sourceImage) return;
 
     const p = isComparing ? DEFAULT_PARAMS : state;
+    const activeScale = forExport ? 1 : previewScale;
 
-    // 1. Prepare oriented source (90° rotation + flip + fine straighten angle with auto-zoom)
+    // 1. Compute full-resolution oriented dimensions and prepare active render source
     const rot90 = ((state.rotation % 360) + 360) % 360;
     const swapDims = rot90 === 90 || rot90 === 270;
-    const srcW = sourceImage.naturalWidth || sourceImage.width;
-    const srcH = sourceImage.naturalHeight || sourceImage.height;
+    const fullSrcW = sourceImage.naturalWidth || sourceImage.width;
+    const fullSrcH = sourceImage.naturalHeight || sourceImage.height;
+    const fullOrientW = swapDims ? fullSrcH : fullSrcW;
+    const fullOrientH = swapDims ? fullSrcW : fullSrcH;
+
+    const renderSrc = activeScale < 1 && proxySourceCanvas.width > 0 ? proxySourceCanvas : sourceImage;
+    const srcW = renderSrc.naturalWidth || renderSrc.width;
+    const srcH = renderSrc.naturalHeight || renderSrc.height;
     const orientW = swapDims ? srcH : srcW;
     const orientH = swapDims ? srcW : srcH;
 
@@ -765,11 +855,14 @@
       (state.flipH ? -1 : 1) * straightenZoom,
       (state.flipV ? -1 : 1) * straightenZoom
     );
-    oCtx.drawImage(sourceImage, -srcW / 2, -srcH / 2, srcW, srcH);
+    oCtx.drawImage(renderSrc, -srcW / 2, -srcH / 2, srcW, srcH);
     oCtx.restore();
 
     // 2. Determine active crop region
-    const activeCrop = activeTab === 'crop' ? { x: 0, y: 0, w: 1, h: 1 } : state.crop;
+    const activeCrop = !forExport && activeTab === 'crop' ? { x: 0, y: 0, w: 1, h: 1 } : state.crop;
+    fullOutW = Math.max(1, Math.round(activeCrop.w * fullOrientW));
+    fullOutH = Math.max(1, Math.round(activeCrop.h * fullOrientH));
+
     const cropX = Math.round(activeCrop.x * orientW);
     const cropY = Math.round(activeCrop.y * orientH);
     const outW = Math.max(1, Math.round(activeCrop.w * orientW));
@@ -778,13 +871,22 @@
     if (editorCanvas.width !== outW || editorCanvas.height !== outH) {
       editorCanvas.width = outW;
       editorCanvas.height = outH;
-      updateViewportZoom();
+      if (!forExport) updateViewportZoom();
     }
 
-    dimLabel.textContent = `${outW} × ${outH} px`;
+    if (!forExport) {
+      if (activeScale < 1) {
+        const proxyTag = activeScale === 0.5 ? '1/2 Proxy' : '1/4 Proxy';
+        dimLabel.textContent = `${fullOutW} × ${fullOutH} px • ${proxyTag} (${outW} × ${outH})`;
+        dimLabel.classList.add('proxy-active');
+      } else {
+        dimLabel.textContent = `${fullOutW} × ${fullOutH} px`;
+        dimLabel.classList.remove('proxy-active');
+      }
+    }
 
     // Cache ungraded cropped base for Split Before/After mode
-    if (splitCompareEnabled) {
+    if (splitCompareEnabled && !forExport) {
       ungradedCropCanvas.width = outW;
       ungradedCropCanvas.height = outH;
       ungradedCropCanvas.getContext('2d').drawImage(orientedCanvas, cropX, cropY, outW, outH, 0, 0, outW, outH);
@@ -813,12 +915,13 @@
 
     // 6. Blur Engine (Uniform Gaussian, Portrait Radial Focus, or Linear Tilt-Shift)
     ctx.clearRect(0, 0, outW, outH);
+    const effectiveBlur = p.blur * activeScale;
 
     if (p.blur <= 0.1) {
       ctx.drawImage(sharpCanvas, 0, 0);
     } else if (p.blurMode === 'gaussian') {
       ctx.save();
-      ctx.filter = `blur(${p.blur}px)`;
+      ctx.filter = `blur(${effectiveBlur}px)`;
       ctx.drawImage(sharpCanvas, 0, 0);
       ctx.restore();
     } else {
@@ -826,7 +929,7 @@
       blurCanvas.height = outH;
       const bCtx = blurCanvas.getContext('2d');
       bCtx.drawImage(sharpCanvas, 0, 0);
-      bCtx.filter = `blur(${p.blur}px)`;
+      bCtx.filter = `blur(${effectiveBlur}px)`;
       bCtx.drawImage(sharpCanvas, 0, 0);
       bCtx.filter = 'none';
 
@@ -873,7 +976,7 @@
     applyVignetteAndGrain(ctx, outW, outH, p);
 
     // 8. If Split Before/After Wipe is enabled, draw Original on the left side of the split bar
-    if (splitCompareEnabled && !isComparing) {
+    if (splitCompareEnabled && !isComparing && !forExport) {
       const splitPx = Math.round(splitPosition * outW);
       if (splitPx > 0) {
         ctx.save();
@@ -886,11 +989,13 @@
     }
 
     // 9. Update Histogram, Tone Curve Canvas, and Overlays
-    updateHistogram();
-    drawToneCurveWidget();
-    updateCropOverlayGeometry();
-    updateFocusIndicatorGeometry();
-    updateSplitOverlayGeometry();
+    if (!forExport) {
+      updateHistogram();
+      drawToneCurveWidget();
+      updateCropOverlayGeometry();
+      updateFocusIndicatorGeometry();
+      updateSplitOverlayGeometry();
+    }
   }
 
   function applyColorGradingOverlays(sCtx, w, h, p) {
@@ -1243,15 +1348,18 @@
   // ==================== VIEWPORT ZOOM & FIT ====================
   function updateViewportZoom() {
     if (!editorCanvas.width || !editorCanvas.height) return;
+    const baseW = fullOutW || editorCanvas.width;
+    const baseH = fullOutH || editorCanvas.height;
+
     const stageRect = canvasStage.getBoundingClientRect();
     const availW = Math.max(100, stageRect.width - 56);
     const availH = Math.max(100, stageRect.height - 56);
 
-    const fitScale = Math.min(availW / editorCanvas.width, availH / editorCanvas.height, 1);
+    const fitScale = Math.min(availW / baseW, availH / baseH, 1);
     const scale = zoomMode === 'fit' ? fitScale : zoomMode;
 
-    editorCanvas.style.width = `${Math.round(editorCanvas.width * scale)}px`;
-    editorCanvas.style.height = `${Math.round(editorCanvas.height * scale)}px`;
+    editorCanvas.style.width = `${Math.round(baseW * scale)}px`;
+    editorCanvas.style.height = `${Math.round(baseH * scale)}px`;
 
     zoomReadout.textContent = zoomMode === 'fit' ? `Fit (${Math.round(scale * 100)}%)` : `${Math.round(scale * 100)}%`;
 
@@ -1277,8 +1385,10 @@
     cropBoxEl.style.width = `${cropDraft.w * dispW}px`;
     cropBoxEl.style.height = `${cropDraft.h * dispH}px`;
 
-    const pixelW = Math.round(cropDraft.w * editorCanvas.width);
-    const pixelH = Math.round(cropDraft.h * editorCanvas.height);
+    const baseW = fullOutW || editorCanvas.width;
+    const baseH = fullOutH || editorCanvas.height;
+    const pixelW = Math.round(cropDraft.w * baseW);
+    const pixelH = Math.round(cropDraft.h * baseH);
     cropReadoutEl.textContent = `${pixelW} × ${pixelH}`;
   }
 
@@ -1289,8 +1399,8 @@
       return;
     }
 
-    const imgW = editorCanvas.width || 1;
-    const imgH = editorCanvas.height || 1;
+    const imgW = fullOutW || editorCanvas.width || 1;
+    const imgH = fullOutH || editorCanvas.height || 1;
     const targetRatio = aspectSetting === 'original' ? imgW / imgH : parseFloat(aspectSetting);
 
     let wPx = imgW * 0.86;
@@ -1353,8 +1463,8 @@
       }
 
       if (cropAspect !== 'free') {
-        const imgW = editorCanvas.width || 1;
-        const imgH = editorCanvas.height || 1;
+        const imgW = fullOutW || editorCanvas.width || 1;
+        const imgH = fullOutH || editorCanvas.height || 1;
         const targetRatio = cropAspect === 'original' ? imgW / imgH : parseFloat(cropAspect);
         const normRatio = targetRatio * (imgH / imgW);
         h = w / normRatio;
@@ -1786,14 +1896,16 @@
     compareBtn.addEventListener('pointerdown', startCompare);
     window.addEventListener('pointerup', endCompare);
 
-    // 13. Zoom Controls
+    // 13. Zoom & Proxy Preview Controls
     document.getElementById('btn-zoom-in').addEventListener('click', () => {
-      const curr = zoomMode === 'fit' ? editorCanvas.clientWidth / editorCanvas.width : zoomMode;
+      const baseW = fullOutW || editorCanvas.width || 1;
+      const curr = zoomMode === 'fit' ? editorCanvas.clientWidth / baseW : zoomMode;
       zoomMode = Math.min(3, +(curr * 1.25).toFixed(2));
       updateViewportZoom();
     });
     document.getElementById('btn-zoom-out').addEventListener('click', () => {
-      const curr = zoomMode === 'fit' ? editorCanvas.clientWidth / editorCanvas.width : zoomMode;
+      const baseW = fullOutW || editorCanvas.width || 1;
+      const curr = zoomMode === 'fit' ? editorCanvas.clientWidth / baseW : zoomMode;
       zoomMode = Math.max(0.15, +(curr / 1.25).toFixed(2));
       updateViewportZoom();
     });
@@ -1804,6 +1916,31 @@
     document.getElementById('btn-zoom-100').addEventListener('click', () => {
       zoomMode = 1;
       updateViewportZoom();
+    });
+
+    document.querySelectorAll('#proxy-controls [data-proxy-scale]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const nextScale = parseFloat(btn.dataset.proxyScale);
+        if (!isNaN(nextScale)) {
+          setPreviewScale(nextScale);
+        }
+      });
+    });
+
+    // High-Resolution (>4K) Proxy Prompt Modal
+    const proxyModal = document.getElementById('proxy-modal');
+    const closeProxyModal = () => proxyModal.classList.add('hidden');
+
+    document.getElementById('btn-proxy-half').addEventListener('click', () => {
+      setPreviewScale(0.5);
+      closeProxyModal();
+    });
+    document.getElementById('btn-proxy-full').addEventListener('click', () => {
+      setPreviewScale(1);
+      closeProxyModal();
+    });
+    document.getElementById('btn-proxy-close').addEventListener('click', () => {
+      closeProxyModal();
     });
 
     window.addEventListener('resize', () => updateViewportZoom());
@@ -1820,6 +1957,9 @@
         redo();
       } else if (e.key === '\\') {
         startCompare();
+      } else if (e.key === 'Escape') {
+        proxyModal.classList.add('hidden');
+        document.getElementById('export-modal').classList.add('hidden');
       }
     });
     window.addEventListener('keyup', (e) => {
@@ -1844,6 +1984,10 @@
       const finalH = Math.max(1, Math.round(state.crop.h * oh));
 
       document.getElementById('export-res-label').textContent = `${finalW} × ${finalH} px`;
+      const proxyNote = document.getElementById('export-proxy-note');
+      if (proxyNote) {
+        proxyNote.classList.toggle('hidden', previewScale >= 1);
+      }
       exportModal.classList.remove('hidden');
     });
 
@@ -1876,7 +2020,9 @@
     activeTab = 'adjust';
     isComparing = false;
     splitCompareEnabled = false;
-    renderFrame();
+
+    // Render all active filters & adjustments at full 1:1 original resolution
+    renderFrame({ forExport: true });
 
     const mime = document.getElementById('export-format').value;
     const quality = parseInt(document.getElementById('export-quality').value, 10) / 100;
@@ -1886,24 +2032,27 @@
 
     editorCanvas.toBlob(
       (blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${rawName}.${ext}`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${rawName}.${ext}`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
+
+        // Restore preview resolution and active viewport state
+        activeTab = prevTab;
+        isComparing = prevCompare;
+        splitCompareEnabled = prevSplit;
+        renderFrame({ forExport: false });
+        updateViewportZoom();
       },
       mime,
       quality
     );
-
-    activeTab = prevTab;
-    isComparing = prevCompare;
-    splitCompareEnabled = prevSplit;
-    renderFrame();
   }
 
   // ==================== UTILITIES ====================

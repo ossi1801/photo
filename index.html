@@ -170,6 +170,12 @@
             <button id="btn-zoom-fit" class="hud-btn" title="Fit to Screen">Fit</button>
             <button id="btn-zoom-100" class="hud-btn" title="100% Actual Pixels">1:1</button>
           </div>
+          <div class="proxy-controls" id="proxy-controls" title="Preview Render Quality — Exports always save at full resolution">
+            <span class="proxy-label">Preview:</span>
+            <button type="button" class="hud-btn active" data-proxy-scale="1" title="Full Resolution Preview (100%)">Full</button>
+            <button type="button" class="hud-btn" data-proxy-scale="0.5" title="Half Resolution Proxy Preview (50% dimensions, 4× faster)">1/2 Proxy</button>
+            <button type="button" class="hud-btn" data-proxy-scale="0.25" title="Quarter Resolution Proxy Preview (25% dimensions, 16× faster)">1/4</button>
+          </div>
         </div>
       </section>
 
@@ -712,11 +718,38 @@
 
         <div class="export-summary">
           <div>Final Dimensions: <strong id="export-res-label">-- × -- px</strong></div>
+          <div id="export-proxy-note" class="export-subnote hidden">Exporting at full original resolution (all filters applied to full-size image)</div>
         </div>
       </div>
       <div class="modal-footer">
         <button id="btn-export-cancel" class="btn btn-ghost">Cancel</button>
         <button id="btn-export-download" class="btn btn-primary">Download Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- High-Resolution Proxy Prompt Modal (>4K Images) -->
+  <div id="proxy-modal" class="modal-backdrop hidden">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <h3>High-Resolution Image Detected</h3>
+        <button id="btn-proxy-close" class="btn-close" title="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="proxy-modal-question" class="modal-question">
+          Do you want to use proxy/lower image quality to preview this image?
+        </p>
+        <div class="export-summary proxy-summary">
+          <div>Original Image Size: <strong id="proxy-orig-res">-- × -- px</strong></div>
+          <div>Proxy Preview (1/2 Res): <strong id="proxy-half-res">-- × -- px</strong></div>
+        </div>
+        <p class="helper-banner">
+          Proxy mode previews the image at half resolution for much smoother real-time editing. When exporting, your selected filters and adjustments are always applied to the full-size image.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-proxy-full" class="btn btn-secondary">Use Full Resolution</button>
+        <button id="btn-proxy-half" class="btn btn-primary">Use 1/2 Proxy Preview</button>
       </div>
     </div>
   </div>
