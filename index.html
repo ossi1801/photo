@@ -3,51 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CineFrameGrade — Browser-Based Still Footage &amp; Photo Color Grading Studio</title>
-  <meta name="description" content="CineFrameGrade is a free, zero-dependency, 100% client-side still footage and photo color grading studio in your browser. Features real-time RGB parade histogram, cinematic film presets, split toning, depth-of-field tilt-shift &amp; radial blur, 35mm film grain, and non-destructive aspect ratio cropping." />
-  <meta name="keywords" content="CineFrameGrade, photo color grading, still footage grading, browser photo editor, HTML5 canvas photo editor, online color grading studio, RGB histogram, split toning, tilt-shift blur, radial blur, 35mm film grain, cinematic LUT presets, teal and orange, bleach bypass, anamorphic crop, client-side image editor" />
-  <meta name="author" content="CineFrameGrade Contributors" />
-  <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#0f1014" />
-
-  <!-- Open Graph / Social Discovery -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="CineFrameGrade — Still Footage &amp; Photo Color Grading Studio" />
-  <meta property="og:description" content="Professional browser-based color grading, optical depth-of-field blur, real-time RGB histogram, and cinema aspect-ratio framing with 100% local privacy." />
-  <meta property="og:image" content="assets/videos/cineframegrade-overview-poster.png" />
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="CineFrameGrade — Still Footage &amp; Photo Color Grading Studio" />
-  <meta name="twitter:description" content="Zero-dependency HTML5 Canvas color grading, film look presets, split toning, tilt-shift optics, and cinema framing right in your browser." />
-
-  <!-- Schema.org JSON-LD for Google Rich Results -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "CineFrameGrade",
-    "applicationCategory": "MultimediaApplication",
-    "operatingSystem": "Web Browser (Cross-Platform)",
-    "description": "A client-side still footage and photo color grading studio built with pure Vanilla JavaScript and HTML5 Canvas 2D, featuring real-time RGB histograms, cinematic look presets, split toning, radial and tilt-shift depth-of-field blur, 35mm film grain, and non-destructive cinema cropping.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "featureList": [
-      "Real-time RGB Parade & Luminance Histogram",
-      "8 One-Click Cinematic Film Look Presets",
-      "Primary Exposure, Contrast, Highlights, Shadows & Matte Black Fade",
-      "White Balance Temperature, Tint, Vibrance, Saturation & Split Toning",
-      "Gaussian, Radial Focus & Linear Tilt-Shift Depth-of-Field Blur",
-      "35mm Procedural Film Grain & Optical Lens Vignette",
-      "Non-Destructive Cinema Aspect Ratio Cropping (2.35:1 Scope, 16:9, 4:5, 1:1)",
-      "Full-Resolution Lossless PNG, JPEG & WebP Local Export"
-    ]
-  }
-  </script>
-
+  <title>LumenFrame — Lightroom-Style Still Photo &amp; Footage Editor</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -60,28 +16,38 @@
           <polygon points="12 3 16.5 11 7.5 11"></polygon>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
-        <span class="brand-title">CineFrameGrade</span>
-        <span class="brand-badge">STILL GRADING STUDIO</span>
+        <span class="brand-title">LumenFrame</span>
+        <span class="brand-badge">PHOTO STUDIO</span>
       </div>
 
       <div class="toolbar-center">
-        <label for="file-input" class="btn btn-secondary" title="Open Local Image (Ctrl+O)">
+        <label for="file-input" class="btn btn-secondary" title="Open Local Photo from your computer">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="17 8 12 3 7 8"/>
             <line x1="12" y1="3" x2="12" y2="15"/>
           </svg>
-          Open Image
+          Open Photo
         </label>
         <input type="file" id="file-input" accept="image/*" hidden />
 
-        <button id="btn-sample" class="btn btn-ghost" title="Load a sample test frame">
+        <button id="btn-sample" class="btn btn-ghost" title="Load built-in sample landscape photo">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <polyline points="21 15 16 10 5 21"/>
           </svg>
-          Sample Frame
+          Sample Photo
+        </button>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 1-Click Smart Auto Enhance -->
+        <button id="btn-auto-enhance" class="btn btn-magic" title="Automatically balance exposure, contrast, shadows, and vibrance">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/>
+          </svg>
+          Auto Enhance
         </button>
 
         <div class="toolbar-divider"></div>
@@ -101,15 +67,21 @@
 
         <div class="toolbar-divider"></div>
 
-        <button id="btn-compare" class="btn btn-ghost" title="Hold or press Space/Backslash to compare original">
+        <button id="btn-split-toggle" class="btn btn-secondary" title="Toggle interactive Before / After split slider">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <line x1="12" y1="3" x2="12" y2="21"/>
+            <polyline points="9 10 7 12 9 14"/>
+            <polyline points="15 10 17 12 15 14"/>
           </svg>
-          Hold Compare
+          Split Before/After
         </button>
 
-        <button id="btn-reset-all" class="btn btn-ghost btn-danger-hover" title="Reset all adjustments">
+        <button id="btn-compare" class="btn btn-ghost" title="Hold button (or press \) to view original photo">
+          Hold Original
+        </button>
+
+        <button id="btn-reset-all" class="btn btn-ghost btn-danger-hover" title="Reset all edits back to original">
           Reset All
         </button>
       </div>
@@ -122,7 +94,7 @@
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
-          Export Still
+          Save / Export
         </button>
       </div>
     </header>
@@ -139,7 +111,7 @@
               <polyline points="17 8 12 3 7 8"/>
               <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
-            <p>Drop image anywhere to load</p>
+            <p>Drop your photo anywhere to start editing</p>
           </div>
         </div>
 
@@ -147,15 +119,30 @@
           <div class="canvas-wrapper" id="canvas-wrapper">
             <canvas id="editor-canvas"></canvas>
 
+            <!-- Interactive Before / After Split Wipe Overlay -->
+            <div id="split-overlay" class="split-overlay hidden">
+              <div class="split-tag split-tag-before">BEFORE</div>
+              <div class="split-tag split-tag-after">AFTER</div>
+              <div id="split-line" class="split-line">
+                <div class="split-handle">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 6 4 12 9 18"></polyline>
+                    <polyline points="15 6 20 12 15 18"></polyline>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Horizon Leveling Grid (shown while dragging Straighten slider) -->
+            <div id="straighten-grid" class="straighten-grid hidden"></div>
+
             <!-- Interactive Crop Overlay -->
             <div id="crop-overlay" class="crop-overlay hidden">
               <div id="crop-box" class="crop-box">
-                <!-- Rule of thirds grid -->
                 <div class="crop-grid-line crop-grid-v1"></div>
                 <div class="crop-grid-line crop-grid-v2"></div>
                 <div class="crop-grid-line crop-grid-h1"></div>
                 <div class="crop-grid-line crop-grid-h2"></div>
-                <!-- Resize handles -->
                 <div class="crop-handle nw" data-handle="nw"></div>
                 <div class="crop-handle n" data-handle="n"></div>
                 <div class="crop-handle ne" data-handle="ne"></div>
@@ -169,19 +156,19 @@
             </div>
 
             <!-- Focus / Tilt-Shift Target Indicator -->
-            <div id="focus-indicator" class="focus-indicator hidden"></div>
+            <div id="focus-indicator" class="focus-indicator hidden" title="Drag on image to move sharp focus point"></div>
           </div>
         </div>
 
-        <!-- Bottom HUD Controls (Zoom, Info, Original indicator) -->
+        <!-- Bottom HUD Controls -->
         <div class="viewport-hud">
-          <div id="compare-badge" class="compare-badge hidden">ORIGINAL UNGRADED</div>
+          <div id="compare-badge" class="compare-badge hidden">VIEWING ORIGINAL PHOTO</div>
           <div class="zoom-controls">
-            <button id="btn-zoom-out" class="hud-btn" title="Zoom Out (-)">−</button>
+            <button id="btn-zoom-out" class="hud-btn" title="Zoom Out">−</button>
             <span id="zoom-readout" class="zoom-label">Fit</span>
-            <button id="btn-zoom-in" class="hud-btn" title="Zoom In (+)">+</button>
-            <button id="btn-zoom-fit" class="hud-btn" title="Fit to Screen (0)">Fit</button>
-            <button id="btn-zoom-100" class="hud-btn" title="100% Actual Pixels (1)">1:1</button>
+            <button id="btn-zoom-in" class="hud-btn" title="Zoom In">+</button>
+            <button id="btn-zoom-fit" class="hud-btn" title="Fit to Screen">Fit</button>
+            <button id="btn-zoom-100" class="hud-btn" title="100% Actual Pixels">1:1</button>
           </div>
         </div>
       </section>
@@ -191,366 +178,503 @@
         <!-- Real-Time RGB Histogram -->
         <div class="histogram-section">
           <div class="section-header-compact">
-            <span>RGB PARADE / HISTOGRAM</span>
-            <span id="luma-avg" class="sub-readout">Luma: --</span>
+            <span>BRIGHTNESS &amp; COLOR HISTOGRAM</span>
+            <span id="luma-avg" class="sub-readout">Brightness: --</span>
           </div>
-          <canvas id="histogram-canvas" width="280" height="84"></canvas>
+          <canvas id="histogram-canvas" width="310" height="72"></canvas>
         </div>
 
-        <!-- Inspector Mode Tabs -->
+        <!-- 4 Simple Beginner-Friendly Tabs -->
         <nav class="inspector-tabs">
-          <button class="tab-btn active" data-tab="color">
+          <button class="tab-btn active" data-tab="adjust" title="Presets, Exposure, Color &amp; Clarity">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="13.5" cy="6.5" r="2.5"/>
-              <circle cx="17.5" cy="10.5" r="2.5"/>
-              <circle cx="8.5" cy="7.5" r="2.5"/>
-              <circle cx="6.5" cy="12.5" r="2.5"/>
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
             </svg>
-            Color Grade
+            Basic
           </button>
-          <button class="tab-btn" data-tab="blur">
+          <button class="tab-btn" data-tab="tone" title="Tone Curve, Color Mixer (HSL) &amp; Split Toning">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 20c6 0 6-16 18-16"/>
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+            </svg>
+            Curve &amp; HSL
+          </button>
+          <button class="tab-btn" data-tab="blur" title="Background Blur, Vignette &amp; Film Grain">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
             </svg>
-            Blur &amp; Optics
+            Blur &amp; FX
           </button>
-          <button class="tab-btn" data-tab="crop">
+          <button class="tab-btn" data-tab="crop" title="Crop, Aspect Ratio, Straighten &amp; Rotate">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"/>
               <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"/>
             </svg>
-            Crop &amp; Frame
+            Crop
           </button>
         </nav>
 
-        <!-- TAB 1: COLOR GRADING -->
-        <div class="tab-panel active" id="tab-color">
-          <!-- Cinematic Look Presets -->
-          <div class="control-group">
-            <div class="group-header">
-              <span>Cinematic Look Presets</span>
-              <span class="hint-text">One-click film grades</span>
-            </div>
-            <div class="preset-grid" id="preset-grid">
-              <button class="preset-card active" data-preset="none">
-                <span class="preset-swatch swatch-none"></span>
-                <span class="preset-name">Neutral</span>
-              </button>
-              <button class="preset-card" data-preset="teal-orange">
-                <span class="preset-swatch swatch-teal-orange"></span>
-                <span class="preset-name">Teal &amp; Orange</span>
-              </button>
-              <button class="preset-card" data-preset="kodak-warm">
-                <span class="preset-swatch swatch-kodak"></span>
-                <span class="preset-name">Golden 35mm</span>
-              </button>
-              <button class="preset-card" data-preset="bleach-bypass">
-                <span class="preset-swatch swatch-bleach"></span>
-                <span class="preset-name">Bleach Bypass</span>
-              </button>
-              <button class="preset-card" data-preset="noir">
-                <span class="preset-swatch swatch-noir"></span>
-                <span class="preset-name">Silver Noir</span>
-              </button>
-              <button class="preset-card" data-preset="faded-matte">
-                <span class="preset-swatch swatch-matte"></span>
-                <span class="preset-name">Faded Matte</span>
-              </button>
-              <button class="preset-card" data-preset="cyberpunk">
-                <span class="preset-swatch swatch-cyber"></span>
-                <span class="preset-name">Neon Night</span>
-              </button>
-              <button class="preset-card" data-preset="emerald-cinema">
-                <span class="preset-swatch swatch-emerald"></span>
-                <span class="preset-name">Matrix Green</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Primary Light Controls -->
-          <div class="control-group">
-            <div class="group-header">
-              <span>Primary Exposure &amp; Contrast</span>
-              <span class="hint-text">Double-click slider to reset</span>
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-exposure">Exposure</label>
-                <span class="slider-val" id="val-exposure">0</span>
+        <!-- ==================== TAB 1: BASIC ADJUSTMENTS ==================== -->
+        <div class="tab-panel active" id="tab-adjust">
+          <!-- Accordion 1: One-Click Presets -->
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>1-Click Look Presets</span>
+              <span class="hint-text">Instant styles</span>
+            </summary>
+            <div class="accordion-body">
+              <div class="preset-grid" id="preset-grid">
+                <button class="preset-card active" data-preset="none">
+                  <span class="preset-swatch swatch-none"></span>
+                  <span class="preset-name">Original</span>
+                </button>
+                <button class="preset-card" data-preset="vivid-pop">
+                  <span class="preset-swatch swatch-vivid"></span>
+                  <span class="preset-name">Vivid Landscape</span>
+                </button>
+                <button class="preset-card" data-preset="soft-portrait">
+                  <span class="preset-swatch swatch-portrait"></span>
+                  <span class="preset-name">Warm Portrait</span>
+                </button>
+                <button class="preset-card" data-preset="teal-orange">
+                  <span class="preset-swatch swatch-teal-orange"></span>
+                  <span class="preset-name">Teal &amp; Orange</span>
+                </button>
+                <button class="preset-card" data-preset="kodak-warm">
+                  <span class="preset-swatch swatch-kodak"></span>
+                  <span class="preset-name">Golden 35mm</span>
+                </button>
+                <button class="preset-card" data-preset="faded-matte">
+                  <span class="preset-swatch swatch-matte"></span>
+                  <span class="preset-name">Creamy Matte</span>
+                </button>
+                <button class="preset-card" data-preset="noir">
+                  <span class="preset-swatch swatch-noir"></span>
+                  <span class="preset-name">B&amp;W Classic</span>
+                </button>
+                <button class="preset-card" data-preset="cyberpunk">
+                  <span class="preset-swatch swatch-cyber"></span>
+                  <span class="preset-name">Neon Night</span>
+                </button>
               </div>
-              <input type="range" id="ctrl-exposure" data-param="exposure" min="-100" max="100" value="0" data-default="0" />
             </div>
+          </details>
 
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-contrast">Contrast</label>
-                <span class="slider-val" id="val-contrast">0</span>
-              </div>
-              <input type="range" id="ctrl-contrast" data-param="contrast" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-highlights">Highlights</label>
-                <span class="slider-val" id="val-highlights">0</span>
-              </div>
-              <input type="range" id="ctrl-highlights" data-param="highlights" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-shadows">Shadows / Lift</label>
-                <span class="slider-val" id="val-shadows">0</span>
-              </div>
-              <input type="range" id="ctrl-shadows" data-param="shadows" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-fade">Matte Black Fade</label>
-                <span class="slider-val" id="val-fade">0</span>
-              </div>
-              <input type="range" id="ctrl-fade" data-param="fade" min="0" max="100" value="0" data-default="0" />
-            </div>
-          </div>
-
-          <!-- Color Balance & White Balance -->
-          <div class="control-group">
-            <div class="group-header">
-              <span>Color &amp; White Balance</span>
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-temperature">Temperature (Cool / Warm)</label>
-                <span class="slider-val" id="val-temperature">0</span>
-              </div>
-              <input type="range" id="ctrl-temperature" class="track-temp" data-param="temperature" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-tint">Tint (Green / Magenta)</label>
-                <span class="slider-val" id="val-tint">0</span>
-              </div>
-              <input type="range" id="ctrl-tint" class="track-tint" data-param="tint" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-saturation">Saturation</label>
-                <span class="slider-val" id="val-saturation">0</span>
-              </div>
-              <input type="range" id="ctrl-saturation" data-param="saturation" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-vibrance">Vibrance</label>
-                <span class="slider-val" id="val-vibrance">0</span>
-              </div>
-              <input type="range" id="ctrl-vibrance" data-param="vibrance" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-hue">Hue Shift (°)</label>
-                <span class="slider-val" id="val-hue">0°</span>
-              </div>
-              <input type="range" id="ctrl-hue" data-param="hue" min="-180" max="180" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-sepia">Sepia / Monochrome Tone</label>
-                <span class="slider-val" id="val-sepia">0%</span>
-              </div>
-              <input type="range" id="ctrl-sepia" data-param="sepia" min="0" max="100" value="0" data-default="0" />
-            </div>
-          </div>
-
-          <!-- Split Toning -->
-          <div class="control-group">
-            <div class="group-header">
-              <span>Split Toning (Shadows &amp; Highlights)</span>
-            </div>
-
-            <div class="split-tone-grid">
-              <div class="tone-box">
-                <label for="ctrl-shadow-color">Shadow Tint</label>
-                <div class="tone-picker-row">
-                  <input type="color" id="ctrl-shadow-color" value="#1b4d6e" />
-                  <input type="range" id="ctrl-shadow-tint-strength" data-param="shadowTintStrength" min="0" max="100" value="0" data-default="0" />
+          <!-- Accordion 2: Light (Lightroom 6-slider stack) -->
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Light &amp; Exposure</span>
+              <button type="button" class="btn-reset-section" data-reset-group="light" title="Reset Light sliders">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <div class="slider-row" title="Overall image brightness">
+                <div class="slider-label">
+                  <label for="ctrl-exposure">Exposure (Brightness)</label>
+                  <span class="slider-val" id="val-exposure">0</span>
                 </div>
-                <span class="sub-readout" id="val-shadowTintStrength">Strength: 0%</span>
+                <input type="range" id="ctrl-exposure" data-param="exposure" min="-100" max="100" value="0" data-default="0" />
               </div>
 
-              <div class="tone-box">
-                <label for="ctrl-highlight-color">Highlight Tint</label>
-                <div class="tone-picker-row">
-                  <input type="color" id="ctrl-highlight-color" value="#f4a261" />
-                  <input type="range" id="ctrl-highlight-tint-strength" data-param="highlightTintStrength" min="0" max="100" value="0" data-default="0" />
+              <div class="slider-row" title="Difference between darks and brights">
+                <div class="slider-label">
+                  <label for="ctrl-contrast">Contrast</label>
+                  <span class="slider-val" id="val-contrast">0</span>
                 </div>
-                <span class="sub-readout" id="val-highlightTintStrength">Strength: 0%</span>
+                <input type="range" id="ctrl-contrast" data-param="contrast" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Recover detail in bright skies or clouds">
+                <div class="slider-label">
+                  <label for="ctrl-highlights">Highlights (Bright areas)</label>
+                  <span class="slider-val" id="val-highlights">0</span>
+                </div>
+                <input type="range" id="ctrl-highlights" data-param="highlights" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Brighten or deepen dark shadow areas">
+                <div class="slider-label">
+                  <label for="ctrl-shadows">Shadows (Dark areas)</label>
+                  <span class="slider-val" id="val-shadows">0</span>
+                </div>
+                <input type="range" id="ctrl-shadows" data-param="shadows" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Set the brightest white point of the photo">
+                <div class="slider-label">
+                  <label for="ctrl-whites">Whites</label>
+                  <span class="slider-val" id="val-whites">0</span>
+                </div>
+                <input type="range" id="ctrl-whites" data-param="whites" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Set the deepest black point of the photo">
+                <div class="slider-label">
+                  <label for="ctrl-blacks">Blacks</label>
+                  <span class="slider-val" id="val-blacks">0</span>
+                </div>
+                <input type="range" id="ctrl-blacks" data-param="blacks" min="-100" max="100" value="0" data-default="0" />
               </div>
             </div>
-          </div>
+          </details>
+
+          <!-- Accordion 3: Color & White Balance -->
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Color &amp; Warmth</span>
+              <button type="button" class="btn-reset-section" data-reset-group="color" title="Reset Color sliders">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <div class="slider-row" title="Make the photo cooler (blue) or warmer (golden)">
+                <div class="slider-label">
+                  <label for="ctrl-temperature">Warmth (Temperature)</label>
+                  <span class="slider-val" id="val-temperature">0</span>
+                </div>
+                <input type="range" id="ctrl-temperature" class="track-temp" data-param="temperature" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Balance between green and magenta tones">
+                <div class="slider-label">
+                  <label for="ctrl-tint">Tint (Green / Magenta)</label>
+                  <span class="slider-val" id="val-tint">0</span>
+                </div>
+                <input type="range" id="ctrl-tint" class="track-tint" data-param="tint" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Smartly boosts muted colors without over-saturating skin tones">
+                <div class="slider-label">
+                  <label for="ctrl-vibrance">Vibrance (Smart Color Boost)</label>
+                  <span class="slider-val" id="val-vibrance">0</span>
+                </div>
+                <input type="range" id="ctrl-vibrance" data-param="vibrance" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Boost or remove all colors equally (-100 = Black & White)">
+                <div class="slider-label">
+                  <label for="ctrl-saturation">Saturation (All Colors)</label>
+                  <span class="slider-val" id="val-saturation">0</span>
+                </div>
+                <input type="range" id="ctrl-saturation" data-param="saturation" min="-100" max="100" value="0" data-default="0" />
+              </div>
+            </div>
+          </details>
+
+          <!-- Accordion 4: Detail & Presence (Clarity, Dehaze, Sharpen) -->
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Presence &amp; Detail (Pop)</span>
+              <button type="button" class="btn-reset-section" data-reset-group="presence" title="Reset Detail sliders">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <div class="slider-row" title="Adds punchy midtone contrast or softens skin when dragged left">
+                <div class="slider-label">
+                  <label for="ctrl-clarity">Clarity (Midtone Punch)</label>
+                  <span class="slider-val" id="val-clarity">0</span>
+                </div>
+                <input type="range" id="ctrl-clarity" data-param="clarity" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Remove atmospheric fog/haze or add dreamy mist">
+                <div class="slider-label">
+                  <label for="ctrl-dehaze">Dehaze (Clear Fog / Sky)</label>
+                  <span class="slider-val" id="val-dehaze">0</span>
+                </div>
+                <input type="range" id="ctrl-dehaze" data-param="dehaze" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row" title="Enhance crisp edge details">
+                <div class="slider-label">
+                  <label for="ctrl-sharpen">Sharpening (Crispness)</label>
+                  <span class="slider-val" id="val-sharpen">0</span>
+                </div>
+                <input type="range" id="ctrl-sharpen" data-param="sharpen" min="0" max="100" value="0" data-default="0" />
+              </div>
+            </div>
+          </details>
         </div>
 
-        <!-- TAB 2: BLUR & OPTICS -->
+        <!-- ==================== TAB 2: TONE CURVE & HSL MIXER ==================== -->
+        <div class="tab-panel" id="tab-tone">
+          <!-- Interactive Tone Curve -->
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Tone Curve</span>
+              <button type="button" class="btn-reset-section" data-reset-group="curve" title="Reset Tone Curve">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <p class="helper-banner">Drag the 5 points on the curve to shape shadows and highlights, or click a quick curve preset below.</p>
+              <div class="curve-container">
+                <canvas id="curve-canvas" width="260" height="200"></canvas>
+              </div>
+              <div class="curve-presets">
+                <button type="button" class="mini-pill active" data-curve-preset="linear">Linear</button>
+                <button type="button" class="mini-pill" data-curve-preset="s-curve">Soft S-Curve</button>
+                <button type="button" class="mini-pill" data-curve-preset="punchy">High Contrast</button>
+                <button type="button" class="mini-pill" data-curve-preset="matte">Matte Lift</button>
+                <button type="button" class="mini-pill" data-curve-preset="bright">Brighten</button>
+              </div>
+            </div>
+          </details>
+
+          <!-- 6-Color HSL Mixer -->
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Targeted Color Mixer (HSL)</span>
+              <button type="button" class="btn-reset-section" data-reset-group="hsl" title="Reset all HSL colors">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <p class="helper-banner">Pick a color below to fine-tune just that color in your photo (e.g. Blue for skies, Green for plants, Orange for skin).</p>
+
+              <div class="hsl-swatches" id="hsl-swatches">
+                <button type="button" class="hsl-dot active" data-hsl-color="red" style="--dot-color: #ef4444" title="Reds"></button>
+                <button type="button" class="hsl-dot" data-hsl-color="orange" style="--dot-color: #f97316" title="Oranges / Skin Tones"></button>
+                <button type="button" class="hsl-dot" data-hsl-color="yellow" style="--dot-color: #eab308" title="Yellows"></button>
+                <button type="button" class="hsl-dot" data-hsl-color="green" style="--dot-color: #22c55e" title="Greens / Foliage"></button>
+                <button type="button" class="hsl-dot" data-hsl-color="blue" style="--dot-color: #3b82f6" title="Blues / Sky &amp; Water"></button>
+                <button type="button" class="hsl-dot" data-hsl-color="purple" style="--dot-color: #a855f7" title="Purples &amp; Magentas"></button>
+              </div>
+
+              <div class="hsl-active-title" id="hsl-active-label">Adjusting: <strong>Reds</strong></div>
+
+              <div class="slider-row">
+                <div class="slider-label">
+                  <label for="ctrl-hsl-hue">Hue Shift (Shade)</label>
+                  <span class="slider-val" id="val-hsl-hue">0</span>
+                </div>
+                <input type="range" id="ctrl-hsl-hue" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row">
+                <div class="slider-label">
+                  <label for="ctrl-hsl-sat">Saturation (Intensity)</label>
+                  <span class="slider-val" id="val-hsl-sat">0</span>
+                </div>
+                <input type="range" id="ctrl-hsl-sat" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row">
+                <div class="slider-label">
+                  <label for="ctrl-hsl-lum">Luminance (Brightness)</label>
+                  <span class="slider-val" id="val-hsl-lum">0</span>
+                </div>
+                <input type="range" id="ctrl-hsl-lum" min="-100" max="100" value="0" data-default="0" />
+              </div>
+            </div>
+          </details>
+
+          <!-- Split Toning / Color Grading -->
+          <details class="accordion-card">
+            <summary class="accordion-header">
+              <span>Color Grading (Split Tone &amp; Vintage)</span>
+              <button type="button" class="btn-reset-section" data-reset-group="grading" title="Reset Split Toning">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <div class="split-tone-grid">
+                <div class="tone-box">
+                  <label for="ctrl-shadow-color">Shadow Tint</label>
+                  <div class="tone-picker-row">
+                    <input type="color" id="ctrl-shadow-color" value="#1b4d6e" />
+                    <input type="range" id="ctrl-shadow-tint-strength" data-param="shadowTintStrength" min="0" max="100" value="0" data-default="0" />
+                  </div>
+                  <span class="sub-readout" id="val-shadowTintStrength">Strength: 0%</span>
+                </div>
+
+                <div class="tone-box">
+                  <label for="ctrl-highlight-color">Highlight Tint</label>
+                  <div class="tone-picker-row">
+                    <input type="color" id="ctrl-highlight-color" value="#f4a261" />
+                    <input type="range" id="ctrl-highlight-tint-strength" data-param="highlightTintStrength" min="0" max="100" value="0" data-default="0" />
+                  </div>
+                  <span class="sub-readout" id="val-highlightTintStrength">Strength: 0%</span>
+                </div>
+              </div>
+
+              <div class="slider-row">
+                <div class="slider-label">
+                  <label for="ctrl-fade">Matte Film Fade</label>
+                  <span class="slider-val" id="val-fade">0</span>
+                </div>
+                <input type="range" id="ctrl-fade" data-param="fade" min="0" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row">
+                <div class="slider-label">
+                  <label for="ctrl-sepia">Vintage Sepia Warmth</label>
+                  <span class="slider-val" id="val-sepia">0%</span>
+                </div>
+                <input type="range" id="ctrl-sepia" data-param="sepia" min="0" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row">
+                <div class="slider-label">
+                  <label for="ctrl-hue">Global Hue Rotate (°)</label>
+                  <span class="slider-val" id="val-hue">0°</span>
+                </div>
+                <input type="range" id="ctrl-hue" data-param="hue" min="-180" max="180" value="0" data-default="0" />
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- ==================== TAB 3: BLUR & EFFECTS ==================== -->
         <div class="tab-panel" id="tab-blur">
-          <div class="control-group">
-            <div class="group-header">
-              <span>Blur Engine</span>
-              <span class="hint-text">Gaussian &amp; Depth-of-Field</span>
-            </div>
-
-            <div class="segmented-control" id="blur-mode-select">
-              <button class="seg-btn active" data-blur-mode="gaussian">Uniform Gaussian</button>
-              <button class="seg-btn" data-blur-mode="radial">Radial Focus</button>
-              <button class="seg-btn" data-blur-mode="tiltshift">Linear Tilt-Shift</button>
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-blur">Blur Radius (px)</label>
-                <span class="slider-val" id="val-blur">0 px</span>
-              </div>
-              <input type="range" id="ctrl-blur" data-param="blur" min="0" max="50" step="0.5" value="0" data-default="0" />
-            </div>
-
-            <!-- Focus Region Controls (shown for Radial / Tilt-Shift) -->
-            <div id="focus-controls" class="sub-controls hidden">
-              <p class="helper-banner">Tip: You can also click/drag directly on the canvas to position the sharp focus zone.</p>
-
-              <div class="slider-row">
-                <div class="slider-label">
-                  <label for="ctrl-focus-size">Sharp Zone Size</label>
-                  <span class="slider-val" id="val-focusSize">35%</span>
-                </div>
-                <input type="range" id="ctrl-focus-size" data-param="focusSize" min="5" max="85" value="35" data-default="35" />
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Lens Blur &amp; Depth of Field</span>
+              <button type="button" class="btn-reset-section" data-reset-group="blur" title="Reset Blur">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <div class="segmented-control" id="blur-mode-select">
+                <button class="seg-btn active" data-blur-mode="gaussian">Full Blur</button>
+                <button class="seg-btn" data-blur-mode="radial">Portrait Focus</button>
+                <button class="seg-btn" data-blur-mode="tiltshift">Tilt-Shift</button>
               </div>
 
               <div class="slider-row">
                 <div class="slider-label">
-                  <label for="ctrl-focus-feather">Focus Feather / Falloff</label>
-                  <span class="slider-val" id="val-focusFeather">35%</span>
+                  <label for="ctrl-blur">Blur Amount</label>
+                  <span class="slider-val" id="val-blur">0 px</span>
                 </div>
-                <input type="range" id="ctrl-focus-feather" data-param="focusFeather" min="5" max="80" value="35" data-default="35" />
+                <input type="range" id="ctrl-blur" data-param="blur" min="0" max="50" step="0.5" value="0" data-default="0" />
               </div>
 
-              <div class="slider-row" id="row-focus-angle">
+              <div id="focus-controls" class="sub-controls hidden">
+                <p class="helper-banner">Tip: Click &amp; drag directly on your photo to move the sharp focus area.</p>
+
+                <div class="slider-row">
+                  <div class="slider-label">
+                    <label for="ctrl-focus-size">Sharp Subject Size</label>
+                    <span class="slider-val" id="val-focusSize">35%</span>
+                  </div>
+                  <input type="range" id="ctrl-focus-size" data-param="focusSize" min="5" max="85" value="35" data-default="35" />
+                </div>
+
+                <div class="slider-row">
+                  <div class="slider-label">
+                    <label for="ctrl-focus-feather">Blur Transition Smoothness</label>
+                    <span class="slider-val" id="val-focusFeather">35%</span>
+                  </div>
+                  <input type="range" id="ctrl-focus-feather" data-param="focusFeather" min="5" max="80" value="35" data-default="35" />
+                </div>
+
+                <div class="slider-row" id="row-focus-angle">
+                  <div class="slider-label">
+                    <label for="ctrl-focus-angle">Tilt Angle (°)</label>
+                    <span class="slider-val" id="val-focusAngle">0°</span>
+                  </div>
+                  <input type="range" id="ctrl-focus-angle" data-param="focusAngle" min="-90" max="90" value="0" data-default="0" />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Vignette &amp; Film Grain</span>
+              <button type="button" class="btn-reset-section" data-reset-group="effects" title="Reset Vignette &amp; Grain">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <div class="slider-row" title="Darken (left) or brighten (right) the corners to draw attention to the center">
                 <div class="slider-label">
-                  <label for="ctrl-focus-angle">Tilt Plane Angle (°)</label>
-                  <span class="slider-val" id="val-focusAngle">0°</span>
+                  <label for="ctrl-vignette">Edge Vignette</label>
+                  <span class="slider-val" id="val-vignette">0</span>
                 </div>
-                <input type="range" id="ctrl-focus-angle" data-param="focusAngle" min="-90" max="90" value="0" data-default="0" />
+                <input type="range" id="ctrl-vignette" data-param="vignette" min="-100" max="100" value="0" data-default="0" />
+              </div>
+
+              <div class="slider-row">
+                <div class="slider-label">
+                  <label for="ctrl-vignette-feather">Vignette Softness</label>
+                  <span class="slider-val" id="val-vignetteFeather">55%</span>
+                </div>
+                <input type="range" id="ctrl-vignette-feather" data-param="vignetteFeather" min="10" max="95" value="55" data-default="55" />
+              </div>
+
+              <div class="slider-row" title="Add organic 35mm analog film texture">
+                <div class="slider-label">
+                  <label for="ctrl-grain">35mm Film Grain</label>
+                  <span class="slider-val" id="val-grain">0%</span>
+                </div>
+                <input type="range" id="ctrl-grain" data-param="grain" min="0" max="100" value="0" data-default="0" />
               </div>
             </div>
-          </div>
-
-          <!-- Lens Vignette & Film Texture -->
-          <div class="control-group">
-            <div class="group-header">
-              <span>Lens Vignette &amp; Film Grain</span>
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-vignette">Vignette Amount</label>
-                <span class="slider-val" id="val-vignette">0</span>
-              </div>
-              <input type="range" id="ctrl-vignette" data-param="vignette" min="-100" max="100" value="0" data-default="0" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-vignette-feather">Vignette Feather</label>
-                <span class="slider-val" id="val-vignetteFeather">55%</span>
-              </div>
-              <input type="range" id="ctrl-vignette-feather" data-param="vignetteFeather" min="10" max="95" value="55" data-default="55" />
-            </div>
-
-            <div class="slider-row">
-              <div class="slider-label">
-                <label for="ctrl-grain">35mm Film Grain</label>
-                <span class="slider-val" id="val-grain">0%</span>
-              </div>
-              <input type="range" id="ctrl-grain" data-param="grain" min="0" max="100" value="0" data-default="0" />
-            </div>
-          </div>
+          </details>
         </div>
 
-        <!-- TAB 3: CROP & TRANSFORM -->
+        <!-- ==================== TAB 4: CROP & STRAIGHTEN ==================== -->
         <div class="tab-panel" id="tab-crop">
-          <div class="control-group">
-            <div class="group-header">
-              <span>Interactive Crop Frame</span>
-            </div>
-            <p class="helper-banner">Drag the corners or edges on the image to frame your shot. Choose an aspect ratio below.</p>
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Straighten Horizon &amp; Rotate</span>
+              <button type="button" class="btn-reset-section" data-reset-group="geometry" title="Reset Rotation">Reset</button>
+            </summary>
+            <div class="accordion-body">
+              <div class="slider-row" title="Level a crooked horizon — automatically zooms slightly to avoid blank corners">
+                <div class="slider-label">
+                  <label for="ctrl-straighten">Straighten Angle (°)</label>
+                  <span class="slider-val" id="val-straighten">0°</span>
+                </div>
+                <input type="range" id="ctrl-straighten" data-param="straighten" min="-45" max="45" step="0.5" value="0" data-default="0" />
+              </div>
 
-            <div class="aspect-grid" id="aspect-grid">
-              <button class="aspect-btn active" data-aspect="free">Freeform</button>
-              <button class="aspect-btn" data-aspect="original">Original</button>
-              <button class="aspect-btn" data-aspect="1.7777777778">16:9 HD</button>
-              <button class="aspect-btn" data-aspect="2.35">2.35:1 Scope</button>
-              <button class="aspect-btn" data-aspect="1.3333333333">4:3 Classic</button>
-              <button class="aspect-btn" data-aspect="1">1:1 Square</button>
-              <button class="aspect-btn" data-aspect="0.8">4:5 Portrait</button>
-              <button class="aspect-btn" data-aspect="0.5625">9:16 Vertical</button>
+              <div class="transform-grid">
+                <button id="btn-rot-ccw" class="btn btn-secondary" title="Rotate 90° Left">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10"/>
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                  </svg>
+                  Rotate Left
+                </button>
+                <button id="btn-rot-cw" class="btn btn-secondary" title="Rotate 90° Right">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                  </svg>
+                  Rotate Right
+                </button>
+                <button id="btn-flip-h" class="btn btn-secondary" title="Mirror Horizontally">
+                  Flip Horizontal
+                </button>
+                <button id="btn-flip-v" class="btn btn-secondary" title="Mirror Vertically">
+                  Flip Vertical
+                </button>
+              </div>
             </div>
+          </details>
 
-            <div class="crop-action-bar">
-              <button id="btn-apply-crop" class="btn btn-primary btn-block">
-                Apply Crop Selection
-              </button>
-              <button id="btn-reset-crop" class="btn btn-secondary btn-block">
-                Restore Uncropped Full Frame
-              </button>
-            </div>
-          </div>
+          <details class="accordion-card" open>
+            <summary class="accordion-header">
+              <span>Crop &amp; Aspect Ratio</span>
+            </summary>
+            <div class="accordion-body">
+              <p class="helper-banner">Drag the white frame corners on your photo, or pick a standard ratio below, then click <strong>Apply Crop</strong>.</p>
 
-          <div class="control-group">
-            <div class="group-header">
-              <span>Orientation &amp; Flip</span>
+              <div class="aspect-grid" id="aspect-grid">
+                <button class="aspect-btn active" data-aspect="free">Freeform</button>
+                <button class="aspect-btn" data-aspect="original">Original Ratio</button>
+                <button class="aspect-btn" data-aspect="1">1:1 Square</button>
+                <button class="aspect-btn" data-aspect="0.8">4:5 Instagram</button>
+                <button class="aspect-btn" data-aspect="1.7777777778">16:9 Widescreen</button>
+                <button class="aspect-btn" data-aspect="1.5">3:2 DSLR Photo</button>
+                <button class="aspect-btn" data-aspect="1.3333333333">4:3 Standard</button>
+                <button class="aspect-btn" data-aspect="0.5625">9:16 Story / Reel</button>
+              </div>
+
+              <div class="crop-action-bar">
+                <button id="btn-apply-crop" class="btn btn-primary btn-block">
+                  Apply Crop
+                </button>
+                <button id="btn-reset-crop" class="btn btn-secondary btn-block">
+                  Reset to Full Uncropped Photo
+                </button>
+              </div>
             </div>
-            <div class="transform-grid">
-              <button id="btn-rot-ccw" class="btn btn-secondary" title="Rotate 90° Counter-Clockwise">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="1 4 1 10 7 10"/>
-                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                </svg>
-                Rotate -90°
-              </button>
-              <button id="btn-rot-cw" class="btn btn-secondary" title="Rotate 90° Clockwise">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="23 4 23 10 17 10"/>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                </svg>
-                Rotate +90°
-              </button>
-              <button id="btn-flip-h" class="btn btn-secondary" title="Flip Horizontal">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="17 1 21 5 17 9"/>
-                  <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                  <polyline points="7 23 3 19 7 15"/>
-                  <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                </svg>
-                Flip Horiz
-              </button>
-              <button id="btn-flip-v" class="btn btn-secondary" title="Flip Vertical">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="1 7 5 3 9 7"/>
-                  <line x1="5" y1="3" x2="5" y2="21"/>
-                  <polyline points="23 17 19 21 15 17"/>
-                  <line x1="19" y1="21" x2="19" y2="3"/>
-                </svg>
-                Flip Vert
-              </button>
-            </div>
-          </div>
+          </details>
         </div>
       </aside>
     </main>
@@ -560,39 +684,39 @@
   <div id="export-modal" class="modal-backdrop hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Export Graded Still</h3>
+        <h3>Save &amp; Export Photo</h3>
         <button id="btn-export-close" class="btn-close">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-row">
-          <label for="export-filename">Filename</label>
-          <input type="text" id="export-filename" value="cineframegrade-graded" />
+          <label for="export-filename">File Name</label>
+          <input type="text" id="export-filename" value="lumenframe-edited" />
         </div>
 
         <div class="form-row">
-          <label for="export-format">Image Format</label>
+          <label for="export-format">File Format</label>
           <select id="export-format">
-            <option value="image/png">PNG — Lossless Master (.png)</option>
-            <option value="image/jpeg" selected>JPEG — Compressed Still (.jpg)</option>
-            <option value="image/webp">WebP — Modern High Efficiency (.webp)</option>
+            <option value="image/jpeg" selected>JPEG — Best for sharing &amp; photos (.jpg)</option>
+            <option value="image/png">PNG — Lossless maximum quality (.png)</option>
+            <option value="image/webp">WebP — Modern compact web format (.webp)</option>
           </select>
         </div>
 
         <div class="form-row" id="export-quality-row">
           <div class="slider-label">
-            <label for="export-quality">Compression Quality</label>
+            <label for="export-quality">Image Quality</label>
             <span id="export-quality-val" class="slider-val">92%</span>
           </div>
           <input type="range" id="export-quality" min="10" max="100" value="92" />
         </div>
 
         <div class="export-summary">
-          <div>Output Resolution: <strong id="export-res-label">-- × -- px</strong></div>
+          <div>Final Dimensions: <strong id="export-res-label">-- × -- px</strong></div>
         </div>
       </div>
       <div class="modal-footer">
         <button id="btn-export-cancel" class="btn btn-ghost">Cancel</button>
-        <button id="btn-export-download" class="btn btn-primary">Download Image</button>
+        <button id="btn-export-download" class="btn btn-primary">Download Photo</button>
       </div>
     </div>
   </div>
