@@ -209,19 +209,17 @@ No. CineFrameGrade renders the grading pipeline at the <strong>full native pixel
 Yes. Every preset in CineFrameGrade (such as <em>Teal &amp; Orange</em>, <em>Golden 35mm</em>, or <em>Bleach Bypass</em>) works by setting the underlying Exposure, Contrast, White Balance, Saturation, and Split Toning sliders. After selecting a preset, you can fine-tune any slider or add optical blur and film grain.
 </details>
 
-<details>
-<summary><strong>Why was the project renamed from LumenFrame to CineFrameGrade?</strong></summary>
-<br />
-To ensure a unique, descriptive brand identity with zero naming collisions on GitHub and Google Search, the project was named <strong>CineFrameGrade</strong>—reflecting its core purpose as a cinematic still-frame color grading and optics studio.
-</details>
+
 
 ---
 
-## 🔍 Discoverability & Search Topics (GitHub SEO)
-
-When publishing this repository on GitHub, add the following **Repository Topics** in the *About* settings gear to maximize search indexing across GitHub and Google:
-
+<details>
+<summary><strong>Topics/Tags(for SEO)</strong></summary>
+<br />
 `cineframegrade` `color-grading` `photo-editor` `still-footage` `html5-canvas` `vanilla-javascript` `film-emulation` `split-toning` `rgb-histogram` `tilt-shift` `depth-of-field` `film-grain` `image-processing` `client-side` `zero-dependency`
+</details>
+
+
 
 ---
 
